@@ -15,7 +15,7 @@ params:
     address:
       - city: London
         country: UK
-        street: Street St
+        street: Regent's Park
         title: Address
     buttonClear: Clear
     buttonSend: Send message
@@ -23,9 +23,9 @@ params:
       - email: blewis.mba2023@london.edu
         title: Email
     enable: yes
-  #   phone:
-  #     - phone: (000) 000-0000 x1234
-  #       title: Phone
+    phone:
+      - phone: (123) 456-789
+        title: Phone
   # custom_css: []
   # custom_js: []
   description: Your description
@@ -56,7 +56,7 @@ params:
       - icon: fa-linkedin
         label: LinkedIn
         url: https://www.linkedin.com/in/brentplewis/
-  image: ''
+  image: pic01.jpg
   name: Brent
   navigation:
     button1:
@@ -68,8 +68,8 @@ params:
     links:
       - name: Home
         url: '#'
-      - name: Blogs
-        url: blogs
+      # - name: Blogs
+      #   url: blogs
       # -  name: Generic Blog
       #   url: blogs/ipsum
       # - name: Elements
@@ -80,18 +80,18 @@ params:
   tiles:
     enable: yes
     showcase:
-      - image: pic01.jpg
-        subtitle: Sydney - pretty average place
+      - image: sydney.jpg
+        subtitle: Sydney, AU
         title: My city
         url: https://www.vice.com/en/article/bvm8j4/why-do-sydney-people-hate-sydney
-      - image: pic02.jpg    
-        subtitle: A couple of web-scraping exercises from Homework 3
-        title: Homework 3
-        url: blogs/tempus
-      # - image: pic03.jpg
-      #   subtitle: Lorem Etiam Nullam
-      #   title: Magna
-      #   url: blogs/magna
+      - image: dirtymoney.jpg 
+        subtitle: A web-scraping exercise from Homework 3
+        title: Money in US politics
+        url: blogs/miusp
+      - image: guns.jpg
+        subtitle: A data visualisation exercise from Homework 2
+        title: US gun violence
+        url: blogs/usgv
       # - image: pic04.jpg
       #   subtitle: Nisl Sed Aliquam
       #   title: Ipsum
@@ -109,5 +109,5 @@ params:
     enable: yes
     subtitle: "Plerique existimant notitias analysendas esse de chartis pie faciendis et de materia tali. Profecto maxime est de errore corrigendo in codice tuo per horas in fine."
     title: De re analyzing notitia
-
+  
     url: blogs

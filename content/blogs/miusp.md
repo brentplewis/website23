@@ -1,7 +1,8 @@
 ---
 title: "A web-scraping exercise from Homework 3"
 author: "Brent"
-date: "`r Sys.Date()`"
+date: "2023-06-18"
+image: dirtymoney.jpg
 output:
   html_document:
     theme: flatly
@@ -14,27 +15,7 @@ output:
     toc: yes
 ---
 
-```{r}
-#| label: load-libraries
-#| echo: false # This option disables the printing of code (only output is displayed).
-#| message: false
-#| warning: false
 
-library(tidyverse)
-library(wbstats)
-library(tictoc)
-library(skimr)
-library(countrycode)
-library(here)
-library(DBI)
-library(dbplyr)
-library(arrow)
-library(rvest)
-library(robotstxt) # check if we're allowed to scrape the data
-library(scales)
-library(sf)
-library(readxl)
-```
 
 # Money in US politics
 
@@ -44,11 +25,8 @@ We will scrape and work with data foreign connected PACs that donate to US polit
 
 All data come from [OpenSecrets.org](https://www.opensecrets.org), a *"website tracking the influence of money on U.S. politics, and how that money affects policy and citizens' lives"*.
 
-```{r, eval=FALSE}
-#| label: allow-scraping-opensecrets
-#| warning: false
-#| message: false
 
+```r
 library(robotstxt)
 paths_allowed("https://www.opensecrets.org")
 
@@ -62,7 +40,6 @@ contributions <- contributions_tables %>%
   html_table()
 
 class(contributions)
-
 ```
 
 - First, make sure you can scrape the data for 2022. Use janitor::clean_names() to rename variables scraped using `snake_case` naming. 
@@ -74,7 +51,8 @@ class(contributions)
     -   Write a function that converts contribution amounts in `total`, `dems`, and `repubs` from character strings to numeric values.
     -   Separate the `country_of_origin_parent_company` into two such that country and parent company appear in different columns for country-level analysis.
 
-```{r, eval=FALSE}
+
+```r
 # write a function to parse_currency
 parse_currency <- function(x){
   x %>%
@@ -110,7 +88,8 @@ print(contributions)
     -   have one input: the URL of the webpage and should return a data frame.
     -   add a new column to the data frame for `year`. We will want this information when we ultimately have data from all years, so this is a good time to keep track of it. Our function doesn't take a year argument, but the year is embedded in the URL, so we can extract it out of there, and add it as a new column. Use the `str_sub()` function to extract the last 4 characters from the URL. You will probably want to look at the help for this function to figure out how to specify "last 4 characters".
     
-```{r}
+
+```r
 scrape_pac<-function(base_url){
   # Get the year in the URL
   year<-str_sub(base_url,-4)
@@ -127,13 +106,13 @@ scrape_pac<-function(base_url){
   
   return(data_clean)
 }
-
 ```
 
 
 -   Define the URLs for 2022, 2020, and 2000 contributions. Then, test your function using these URLs as inputs. Does the function seem to do what you expected it to do?
 
-```{r}
+
+```r
 # URLs
 
 url_2022<-"https://www.opensecrets.org/political-action-committees-pacs/foreign-connected-pacs/2022"
@@ -148,21 +127,67 @@ result_2000 <- scrape_pac(url_2000)
 
 # View the results
 head(result_2022)
-head(result_2020)
-head(result_2000)
+```
 
+```
+## # A tibble: 6 × 6
+##   pac_name_affiliate             country_of_origin_pa…¹ total dems  repubs year 
+##   <chr>                          <chr>                  <chr> <chr> <chr>  <chr>
+## 1 Accenture (Accenture)          Ireland/Accenture plc  $3,0… $0    $3,000 2022 
+## 2 Acreage Holdings               Canada/Acreage Holdin… $0    $0    $0     2022 
+## 3 Air Liquide America            France/L'Air Liquide … $17,… $14,… $2,500 2022 
+## 4 Airbus Group                   Netherlands/Airbus Gr… $193… $82,… $111,… 2022 
+## 5 Alexion Pharmaceuticals (Astr… UK/AstraZeneca PLC     $186… $104… $82,2… 2022 
+## 6 Alkermes Inc                   Ireland/Alkermes Plc   $84,… $34,… $50,0… 2022 
+## # ℹ abbreviated name: ¹​country_of_origin_parent_company
+```
+
+```r
+head(result_2020)
+```
+
+```
+## # A tibble: 6 × 6
+##   pac_name_affiliate    country_of_origin_parent_comp…¹ total dems  repubs year 
+##   <chr>                 <chr>                           <chr> <chr> <chr>  <chr>
+## 1 7-Eleven              Japan/Seven & I Holdings        $20,… $1,0… $19,0… 2020 
+## 2 ABB Group (ABB Group) Switzerland/Asea Brown Boveri   $16,… $6,8… $10,1… 2020 
+## 3 Accenture (Accenture) Ireland/Accenture plc           $83,… $50,… $33,0… 2020 
+## 4 Air Liquide America   France/L'Air Liquide SA         $37,… $15,… $22,0… 2020 
+## 5 Airbus Group          Netherlands/Airbus Group        $182… $79,… $103,… 2020 
+## 6 Alkermes Inc          Ireland/Alkermes Plc            $94,… $30,… $64,0… 2020 
+## # ℹ abbreviated name: ¹​country_of_origin_parent_company
+```
+
+```r
+head(result_2000)
+```
+
+```
+## # A tibble: 6 × 6
+##   pac_name_affiliate        country_of_origin_parent_…¹ total dems  repubs year 
+##   <chr>                     <chr>                       <chr> <chr> <chr>  <chr>
+## 1 7-Eleven                  Japan/Ito-Yokado            $8,5… $1,5… $7,000 2000 
+## 2 ABB Group                 Switzerland/Asea Brown Bov… $46,… $17,… $28,5… 2000 
+## 3 Accenture                 UK/Accenture plc            $75,… $23,… $52,9… 2000 
+## 4 ACE INA                   UK/ACE Group                $38,… $12,… $26,0… 2000 
+## 5 Acuson Corp (Siemens AG)  Germany/Siemens AG          $2,0… $2,0… $0     2000 
+## 6 Adtranz (DaimlerChrysler) Germany/DaimlerChrysler AG  $10,… $10,… $500   2000 
+## # ℹ abbreviated name: ¹​country_of_origin_parent_company
 ```
 
 
 -   Construct a vector called `urls` that contains the URLs for each webpage that contains information on foreign-connected PAC contributions for a given year.
 
-```{r}
+
+```r
 years<-c(2000,2020,2022)
 
 urls<- str_c("https://www.opensecrets.org/political-action-committees-pacs/foreign-connected-pacs/",years)
 ```
 -   Map the `scrape_pac()` function over `urls` in a way that will result in a data frame called `contributions_all`.
-```{r}
+
+```r
 library(purrr)
 
 contributions_all <- map_df(urls, scrape_pac)
@@ -170,142 +195,21 @@ contributions_all <- map_df(urls, scrape_pac)
 print(contributions_all)
 ```
 
-
-# Scraping consulting jobs
-
-The website [https://www.consultancy.uk/jobs/](https://www.consultancy.uk/jobs) lists job openings for consulting jobs.
-
-```{r}
-#| label: consulting_jobs_url
-#| eval: false
-
-library(robotstxt)
-paths_allowed("https://www.consultancy.uk") #is it ok to scrape?
-
-base_url <- "https://www.consultancy.uk/jobs/page/1"
-
-listings_html <- base_url %>%
-  read_html()
-
 ```
-Identify the CSS selectors in order to extract the relevant information from this page, namely
-
-1. job 
-1. firm
-1. functional area
-1. type
-
-Can you get all pages of ads, and not just the first one, `https://www.consultancy.uk/jobs/page/1` into a dataframe?
-```{r}
-library(robotstxt)
-paths_allowed("https://www.consultancy.uk") #is it ok to scrape?
-
-
-listings_tbl <- listings_html %>% 
-  html_element(".dataTable") %>% ## select table element
-  html_table()
-
-
-cons_url <- "https://www.consultancy.uk/jobs/page/"
-htmls <- list()
-i <- 1  # Initial value
-error <- FALSE
-
-while (!error) {
-  # Check for an error condition
-  print(i)
-  tryCatch({
-      # Code to be executed if no error condition
-    url <- paste0(cons_url,i)
-    print(url)
-    listings_html <- 
-      paste0(cons_url,i) %>%
-      read_html()
-    
-    htmls <<- c(htmls, listings_html)
-
-  }, error = function(err) {
-     print("Error") 
-     error <<- TRUE
-  })
-    
-  # Update the loop variable
-  i <- i + 1
-}
+## # A tibble: 590 × 6
+##    pac_name_affiliate            country_of_origin_pa…¹ total dems  repubs year 
+##    <chr>                         <chr>                  <chr> <chr> <chr>  <chr>
+##  1 7-Eleven                      Japan/Ito-Yokado       $8,5… $1,5… $7,000 2000 
+##  2 ABB Group                     Switzerland/Asea Brow… $46,… $17,… $28,5… 2000 
+##  3 Accenture                     UK/Accenture plc       $75,… $23,… $52,9… 2000 
+##  4 ACE INA                       UK/ACE Group           $38,… $12,… $26,0… 2000 
+##  5 Acuson Corp (Siemens AG)      Germany/Siemens AG     $2,0… $2,0… $0     2000 
+##  6 Adtranz (DaimlerChrysler)     Germany/DaimlerChrysl… $10,… $10,… $500   2000 
+##  7 AE Staley Manufacturing (Tat… UK/Tate & Lyle         $24,… $10,… $14,0… 2000 
+##  8 AEGON USA (AEGON NV)          Netherlands/Aegon NV   $58,… $10,… $47,7… 2000 
+##  9 AIM Management Group          UK/AMVESCAP            $25,… $10,… $15,0… 2000 
+## 10 Air Liquide America           France/L'Air Liquide … $0    $0    $0     2000 
+## # ℹ 580 more rows
+## # ℹ abbreviated name: ¹​country_of_origin_parent_company
 ```
-
-
--   Write a function called `scrape_jobs()` that scrapes information from the webpage for consulting positions. This function should
-
-    -   have one input: the URL of the webpage and should return a data frame with four columns (variables): job, firm, functional area, and type
-
-    -   Test your function works with other pages too, e.g., https://www.consultancy.uk/jobs/page/2. Does the function seem to do what you expected it to do?
-
-    -   Given that you have to scrape `...jobs/page/1`, `...jobs/page/2`, etc., define your URL so you can join multiple stings into one string, using `str_c()`. For instnace, if `page` is 5, what do you expect the following code to produce?
-    
-```
-base_url <- "https://www.consultancy.uk/jobs/page/1"
-url <- str_c(base_url, page)
-```
--   Construct a vector called `pages` that contains the numbers for each page available
-
-
--   Map the `scrape_jobs()` function over `pages` in a way that will result in a data frame called `all_consulting_jobs`.
-
--   Write the data frame to a csv file called `all_consulting_jobs.csv` in the `data` folder.
-```{r}
-# write a function to parse_currency
-
-scrape_job <- function(url){
-  print(url)
-  listings_html <- 
-    url %>%
-    read_html()
-  
-  listings_tbl <- listings_html %>% 
-    html_element(".dataTable") %>% ## select table element
-    html_table()
-
-  # clean country/parent co and contributions 
-  listings_tbl <- listings_tbl %>%
-    janitor::clean_names()
-  listings_tbl
-}
-
-scrape_jobs <- function(base_url){
-  error <- FALSE
-  df_list <- list()
-  i <- 1  # Initial value
-
-  while (!error) {
-  # Check for an error condition
-  print(i)
-  tryCatch({
-    # Code to be executed if no error condition
-    cons_url <- paste0(base_url,i)
-    listings_tbl <- scrape_job(cons_url)
-    
-    df_list <- append(df_list, list(listings_tbl))
-
-
-  }, error = function(err) {
-     message("Error:", conditionMessage(err))
-     print("Error") 
-     error <<- TRUE
-  })
-    # Update the loop variable
-    i <- i + 1
-  }
-
-  final_df <- bind_rows(df_list)
-  print(final_df)
-}
-  
-all_jobs <- scrape_jobs("https://www.consultancy.uk/jobs/page/")
-  
-print(all_jobs %>%  head(5))
-
-```
-
-
 

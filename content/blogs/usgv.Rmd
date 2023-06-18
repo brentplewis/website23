@@ -2,6 +2,7 @@
 title: "A data visualisation exercise from Homework 2"
 author: "Brent Lewis"
 date: "`r Sys.Date()`"
+image: guns.jpg
 output:
   html_document:
     theme: flatly
