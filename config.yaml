@@ -83,7 +83,7 @@ params:
       - image: sydney.jpg
         subtitle: Sydney, AU
         title: My city
-        url: https://www.vice.com/en/article/bvm8j4/why-do-sydney-people-hate-sydney
+        url: https://en.wikipedia.org/wiki/Australia
       - image: dirtymoney.jpg 
         subtitle: A web-scraping exercise from Homework 3
         title: Money in US politics
